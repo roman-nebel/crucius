@@ -1,5 +1,8 @@
-<div id="canvas"></div>
+<div id="preview">
+  <div id="canvas"></div>
+</div>
 <button id="catch">Catch element</button>
+<button id="exportButton">Export</button>
 <form id="config" oninput="updatePreview(event)">
   <label for="translateX">TranslateX</label>
   <input id="translateX" type="range" min="-100" max="100" value="0" />
@@ -28,14 +31,21 @@
   <label for="originY">OriginY</label>
   <input id="originX" type="range" min="0" max="100" value="50" />
 </form>
+<div id="shadow_canvas"></div>
 <style>
-  #canvas {
+  body {
+    overflow: hidden;
+    background-color: #fff;
+  }
+
+  #preview {
+    background-color: #f3f3f3;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     height: 80%;
-    overflow: hidden;
   }
 
   #canvas svg {
@@ -44,9 +54,15 @@
     width: auto;
     height: auto;
   }
+
+  #shadow_canvas svg {
+    width: 100%;
+    height: 100%;
+  }
 </style>
 
 <script>
+  const MLTY = 2;
   document.getElementById("catch").onclick = () => {
     parent.postMessage({ pluginMessage: { type: "catch" } }, "*");
   };
@@ -58,27 +74,72 @@
     const params = inputs.map((input) => {
       const { id, value } = input;
 
-      if (id === "perspective" && value === "-1") {
-        console.log("here");
-        return "perspective(none)";
-      }
-
       let unit = "px";
       if (id && id.includes("scale")) {
         unit = "";
       } else if (id && (id.includes("rotate") || id.includes("skew"))) {
         unit = "deg";
       }
+
+      return [id, value, unit];
+    });
+
+    const canvas = document.getElementById("canvas");
+    const shadowCanvas = document.getElementById("shadow_canvas");
+
+    const svg = canvas.children[0];
+    const shadowSvg = shadowCanvas.children[0];
+
+    const previewParams = params.map(([id, value, unit]) => {
+      if (id === "perspective") {
+        if (value === "-1") {
+          return `${id}(none)`;
+        } else {
+          return `${id}(${
+            (((canvas.offsetWidth + canvas.offsetHeight) / 2) * value) / 100
+          }${unit})`;
+        }
+      }
+
+      if (id === "translateX") {
+        return `${id}(${(svg.width.baseVal.value * value) / 100}${unit})`;
+      }
+
+      if (id === "translateY") {
+        return `${id}(${(svg.height.baseVal.value * value) / 100}${unit})`;
+      }
+
       return `${id}(${value}${unit})`;
     });
 
-    params.push("scale3d(1, 1, 1)");
+    const originParams = params.map(([id, value, unit]) => {
+      if (id === "perspective") {
+        if (value === "-1") {
+          return `${id}(none)`;
+        } else {
+          return `${id}(${
+            (((shadowCanvas.offsetWidth + shadowCanvas.offsetHeight) / 2) *
+              value) /
+            100
+          }${unit})`;
+        }
+      }
 
-    const svg = document.getElementById("canvas").children[0];
-    svg.style.transform = params.join(" ");
-    svg.style.vectorEffect = "non-scaling-stroke";
-    svg.style.shapeRendering = "geometricPrecision";
-    svg.style.willChange = "transform";
+      if (id === "translateX") {
+        return `${id}(${(shadowSvg.width.baseVal.value * value) / 100}${unit})`;
+      }
+
+      if (id === "translateY") {
+        return `${id}(${
+          (shadowSvg.height.baseVal.value * value) / 100
+        }${unit})`;
+      }
+
+      return `${id}(${value}${unit})`;
+    });
+
+    svg.style.transform = previewParams.join(" ");
+    shadowSvg.style.transform = originParams.join(" ");
   }
 
   function updateOrigin(e) {
@@ -89,13 +150,66 @@
 
     const svg = document.getElementById("canvas").children[0];
     svg.style.transformOrigin = `${originX}% ${originY}%`;
+
+    const shadowSvg = document.getElementById("shadow_canvas").children[0];
+    shadowSvg.style.transformOrigin = `${originX}% ${originY}%`;
   }
 
   onmessage = (event) => {
-    const svg = event.data.pluginMessage;
+    const { svg, params } = event.data.pluginMessage;
     const canvas = document.getElementById("canvas");
-    const canvesHeight = canvas.offsetHeight;
-    document.getElementById("perspective").max = 10 * canvesHeight;
+    const canvasHeight = canvas.offsetHeight;
+    //document.getElementById("perspective").max = 10 * canvasHeight;
     document.getElementById("canvas").innerHTML = svg;
+    const shadowCanvas = document.getElementById("shadow_canvas");
+    shadowCanvas.innerHTML = svg;
+    shadowCanvas.style.width = `${params.width * MLTY}px`;
+    shadowCanvas.style.height = `${params.height * MLTY}px`;
   };
+
+  document.getElementById("exportButton").addEventListener("click", () => {
+    const svgContainer = document.getElementById("shadow_canvas");
+    const svgElement = svgContainer.children[0];
+
+    // Создание нового Canvas элемента
+    const canvas = document.createElement("canvas");
+    let canvasWidth = svgContainer.clientWidth / MLTY;
+    let canvasHeight = svgContainer.clientHeight / MLTY;
+    const canvasRatio = canvasWidth / canvasHeight;
+
+    if (canvasWidth > 4096) {
+      canvasWidth = 4096;
+      canvasHeight = 4096 / canvasRatio;
+    }
+
+    if (canvasHeight > 4096) {
+      canvasWidth = 4096 * canvasRatio;
+      canvasHeight = 4096;
+    }
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const ctx = canvas.getContext("2d");
+
+    // Получение стилей SVG
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+
+      // Преобразование Canvas в Data URL (base64)
+      const base64Image = canvas.toDataURL("image/png");
+      parent.postMessage(
+        { pluginMessage: { type: "insert", image: base64Image } },
+        "*"
+      );
+    };
+    img.src = url;
+  });
 </script>
