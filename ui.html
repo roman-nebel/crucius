@@ -1,40 +1,272 @@
-<div id="preview">
-  <div id="canvas"></div>
+<div id="container">
+  <div id="preview">
+    <div id="canvas"></div>
+  </div>
+  <div class="button_container">
+    <button id="catch">Catch element</button>
+    <button id="exportButton" disabled>Export</button>
+  </div>
+  <div class="settings">
+    <form id="config" oninput="updatePreview(event)">
+      <div class="configBlock">
+        <h3>Move</h3>
+        <div class="configElement">
+          <label for="translateX">Horizontal</label>
+          <div class="inputPair">
+            <input
+              id="translateX_range"
+              type="range"
+              min="-100"
+              max="100"
+              value="0"
+            />
+            <input
+              id="translateX_number"
+              type="number"
+              min="-100"
+              max="100"
+              value="0"
+            />
+          </div>
+        </div>
+        <div class="configElement">
+          <label for="translateY">Vertical</label>
+          <div class="inputPair">
+            <input
+              id="translateY_range"
+              type="range"
+              min="-100"
+              max="100"
+              value="0"
+            />
+            <input
+              id="translateY_number"
+              type="number"
+              min="-100"
+              max="100"
+              value="0"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="configBlock">
+        <h3>Perspective</h3>
+        <div class="configElement">
+          <label for="perspective">Perspective Depth</label>
+          <div class="inputPair">
+            <input
+              id="perspective_range"
+              type="range"
+              min="-1"
+              max="100"
+              value="-1"
+            />
+            <input
+              id="perspective_number"
+              type="number"
+              min="-1"
+              max="100"
+              value="-1"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="configBlock">
+        <h3>Rotate</h3>
+        <div class="configElement">
+          <label for="rotateX">RotateX</label>
+          <div class="inputPair">
+            <input
+              id="rotateX_range"
+              type="range"
+              min="-89"
+              max="89"
+              value="0"
+            />
+            <input
+              id="rotateX_number"
+              type="number"
+              min="-89"
+              max="89"
+              value="0"
+            />
+          </div>
+        </div>
+        <div class="configElement">
+          <label for="rotateY">RotateY</label>
+          <div class="inputPair">
+            <input
+              id="rotateY_range"
+              type="range"
+              min="-89"
+              max="89"
+              value="0"
+            />
+            <input
+              id="rotateY_number"
+              type="number"
+              min="-89"
+              max="89"
+              value="0"
+            />
+          </div>
+        </div>
+        <div class="configElement">
+          <label for="rotateZ">RotateZ</label>
+          <div class="inputPair">
+            <input
+              id="rotateZ_range"
+              type="range"
+              min="-180"
+              max="180"
+              value="0"
+            />
+            <input
+              id="rotateZ_number"
+              type="number"
+              min="-180"
+              max="180"
+              value="0"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="configBlock">
+        <h3>Scale</h3>
+        <div class="configElement">
+          <label for="scaleX">ScaleX</label>
+          <div class="inputPair">
+            <input
+              id="scaleX_range"
+              type="range"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+            <input
+              id="scaleX_number"
+              type="number"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+          </div>
+          <label for="scaleY">ScaleY</label>
+          <div class="inputPair">
+            <input
+              id="scaleY_range"
+              type="range"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+            <input
+              id="scaleY_number"
+              type="number"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="configBlock">
+        <h3>Skew</h3>
+        <div class="configElement">
+          <label for="skewX">SkewX</label>
+          <div class="inputPair">
+            <input id="skewX_range" type="range" min="-89" max="89" value="0" />
+            <input
+              id="skewX_number"
+              type="number"
+              min="-89"
+              max="89"
+              value="0"
+            />
+          </div>
+          <label for="skewY">SkewY</label>
+          <div class="inputPair">
+            <input id="skewY_range" type="range" min="-89" max="89" value="0" />
+            <input
+              id="skewY_number"
+              type="number"
+              min="-89"
+              max="89"
+              value="0"
+            />
+          </div>
+        </div>
+      </div>
+    </form>
+    <form id="origin" oninput="updateOrigin(event)">
+      <div class="configBlock">
+        <h3>Skew</h3>
+        <div class="configElement">
+          <label for="originX">OriginX</label>
+          <div class="inputPair">
+            <input
+              id="originX_range"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <input
+              id="originX_number"
+              type="number"
+              min="0"
+              max="100"
+              value="50"
+            />
+          </div>
+        </div>
+        <div class="configElement">
+          <label for="originY">OriginY</label>
+          <div class="inputPair">
+            <input
+              id="originY_range"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+            />
+            <input
+              id="originY_number"
+              type="number"
+              min="0"
+              max="100"
+              value="50"
+            />
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
-<button id="catch">Catch element</button>
-<button id="exportButton">Export</button>
-<form id="config" oninput="updatePreview(event)">
-  <label for="translateX">TranslateX</label>
-  <input id="translateX" type="range" min="-100" max="100" value="0" />
-  <label for="translateY">TranslateY</label>
-  <input id="translateY" type="range" min="-100" max="100" value="0" />
-  <label for="perspective">Perspective</label>
-  <input id="perspective" type="range" min="-1" max="100" value="-1" />
-  <label for="rotateX">RotateX</label>
-  <input id="rotateX" type="range" min="-89" max="89" value="0" />
-  <label for="rotateY">RotateY</label>
-  <input id="rotateY" type="range" min="-89" max="89" value="0" />
-  <label for="rotateZ">RotateZ</label>
-  <input id="rotateZ" type="range" min="-180" max="180" value="0" />
-  <label for="scaleX">ScaleX</label>
-  <input id="scaleX" type="range" min="0.1" max="10" step="0.1" value="1" />
-  <label for="scaleY">ScaleY</label>
-  <input id="scaleY" type="range" min="0.1" max="10" step="0.1" value="1" />
-  <label for="skewX">SkewX</label>
-  <input id="skewX" type="range" min="-89" max="89" value="0" />
-  <label for="skewY">SkewY</label>
-  <input id="skewY" type="range" min="-89" max="89" value="0" />
-</form>
-<form id="origin" oninput="updateOrigin(event)">
-  <label for="originX">OriginX</label>
-  <input id="originX" type="range" min="0" max="100" value="50" />
-  <label for="originY">OriginY</label>
-  <input id="originX" type="range" min="0" max="100" value="50" />
-</form>
 <div id="shadow_canvas"></div>
 <style>
   body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
+    box-sizing: border-box;
+    font-family: "Inter", "Arial", sans-serif;
+    font-size: 14px;
+    line-height: 1.2rem;
+  }
+
+  #container {
+    padding: 8px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
     background-color: #fff;
   }
 
@@ -45,7 +277,70 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 80%;
+    height: 40%;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #fff;
+    background-color: #0275ff;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+  }
+
+  form {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .button_container {
+    padding: 12px 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .configBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .inputPair {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  input[type="number"] {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"]:hover {
+    border-color: #bbbbbb;
   }
 
   #canvas svg {
@@ -53,6 +348,11 @@
     max-height: 100%;
     width: auto;
     height: auto;
+  }
+
+  .settings {
+    height: 320px;
+    overflow-y: auto;
   }
 
   #shadow_canvas svg {
@@ -67,21 +367,39 @@
     parent.postMessage({ pluginMessage: { type: "catch" } }, "*");
   };
 
+  function updateSiblingInput(initInput) {
+    const { id, value } = initInput;
+    const [param, type] = id.split("_");
+
+    if (type === "range") {
+      document.getElementById(`${param}_number`).value = value;
+    }
+
+    if (type === "number") {
+      document.getElementById(`${param}_range`).value = value;
+    }
+  }
+
   function updatePreview(e) {
+    updateSiblingInput(e.target);
     const inputs = Array.from(
       document.getElementById("config").querySelectorAll("input")
-    );
+    ).filter((item) => item.type === "number");
     const params = inputs.map((input) => {
       const { id, value } = input;
+      const [param, type] = id.split("_");
 
       let unit = "px";
-      if (id && id.includes("scale")) {
+      if (param && param.includes("scale")) {
         unit = "";
-      } else if (id && (id.includes("rotate") || id.includes("skew"))) {
+      } else if (
+        param &&
+        (param.includes("rotate") || param.includes("skew"))
+      ) {
         unit = "deg";
       }
 
-      return [id, value, unit];
+      return [param, value, unit];
     });
 
     const canvas = document.getElementById("canvas");
@@ -143,9 +461,10 @@
   }
 
   function updateOrigin(e) {
+    updateSiblingInput(e.target);
     const inputs = Array.from(
       document.getElementById("origin").querySelectorAll("input")
-    );
+    ).filter((item) => item.type === "number");
     const [originX, originY] = inputs.map((input) => input.value);
 
     const svg = document.getElementById("canvas").children[0];
@@ -165,6 +484,7 @@
     shadowCanvas.innerHTML = svg;
     shadowCanvas.style.width = `${params.width * MLTY}px`;
     shadowCanvas.style.height = `${params.height * MLTY}px`;
+    document.getElementById("exportButton").disabled = false;
   };
 
   document.getElementById("exportButton").addEventListener("click", () => {

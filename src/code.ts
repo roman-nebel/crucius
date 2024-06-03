@@ -1,6 +1,6 @@
 figma.showUI(__html__, {
-  width: 680,
-  height: 780,
+  width: 420,
+  height: 640,
 });
 
 figma.ui.onmessage = async (msg: { type: string; image: string }) => {
