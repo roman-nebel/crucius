@@ -204,7 +204,7 @@
     </form>
     <form id="origin" oninput="updateOrigin(event)">
       <div class="configBlock">
-        <h3>Skew</h3>
+        <h3>Origin</h3>
         <div class="configElement">
           <label for="originX">OriginX</label>
           <div class="inputPair">
@@ -353,6 +353,11 @@
   .settings {
     height: 320px;
     overflow-y: auto;
+  }
+
+  #shadow_canvas {
+    visibility: hidden;
+    z-index: -1;
   }
 
   #shadow_canvas svg {
