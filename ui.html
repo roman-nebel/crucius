@@ -262,7 +262,7 @@
   }
 
   #container {
-    padding: 8px;
+    padding: 10px;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -271,13 +271,93 @@
   }
 
   #preview {
-    background-color: #f3f3f3;
-    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    background-color: #eee;
+    padding: 24px;
+    border-radius: 12px;
+    box-sizing: border-box;
+  }
+
+  #canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border: 2px dashed rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+  }
+
+  #preview::before,
+  #preview::after,
+  #preview::nth-child(3),
+  #preview::nth-child(4) {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  #preview::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+  }
+
+  #preview::after {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: linear-gradient(
+      to top,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+  }
+
+  .outer-container:nth-child(3) {
+    top: 24px;
+    bottom: 24px;
+    left: 0;
+    width: 24px;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+  }
+
+  .outer-container:nth-child(4) {
+    top: 24px;
+    bottom: 24px;
+    right: 0;
+    width: 24px;
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0)
+    );
+  }
+
+  #canvas_overlay {
+    position: absolute;
     width: 100%;
-    height: 40%;
+    height: 100%;
+    box-sizing: border-box;
+    border: 24px solid rgba(255, 255, 255, 0.6);
+    background-color: transparent;
   }
 
   h3 {
@@ -344,14 +424,15 @@
   }
 
   #canvas svg {
-    max-width: 100%;
-    max-height: 100%;
     width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   .settings {
-    height: 320px;
+    height: 260px;
     overflow-y: auto;
   }
 
@@ -482,10 +563,8 @@
   onmessage = (event) => {
     const { svg, params } = event.data.pluginMessage;
     const canvas = document.getElementById("canvas");
-    const canvasHeight = canvas.offsetHeight;
-    //document.getElementById("perspective").max = 10 * canvasHeight;
-    document.getElementById("canvas").innerHTML = svg;
     const shadowCanvas = document.getElementById("shadow_canvas");
+    canvas.innerHTML = svg;
     shadowCanvas.innerHTML = svg;
     shadowCanvas.style.width = `${params.width * MLTY}px`;
     shadowCanvas.style.height = `${params.height * MLTY}px`;
