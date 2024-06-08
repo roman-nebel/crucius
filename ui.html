@@ -1,32 +1,33 @@
 <div id="container">
   <div id="preview">
     <div class="start_container">
-      <button id="choose">Choose element</button>
       <span class="start_hint"
         >Select the target frame on the canvas
         <br />
-        and press "Choose element" to start</span
+        and import it to the pugin</span
       >
+      <button id="import">Import element</button>
     </div>
     <div class="preview_controls hidden">
-      <button class="button_link button_small" id="refresh">
-        choose another
-      </button>
-      <form id="origin" oninput="updateOrigin(event)">
-        <input id="originX_range" type="range" min="0" max="100" value="50" />
-        <input id="originY_range" type="range" min="0" max="100" value="50" />
-      </form>
-      <div class="origin_markers_container">
-        <div class="origin_markers">
-          <div id="origin_marker_x"></div>
-          <div id="origin_marker_y"></div>
+      <div class="origin">
+        <form id="origin_controls" oninput="updateOrigin(event)">
+          <input id="originX_range" type="range" min="0" max="100" value="50" />
+          <input id="originY_range" type="range" min="0" max="100" value="50" />
+        </form>
+        <div class="origin_markers_container">
+          <div class="origin_markers">
+            <div id="origin_marker_x"></div>
+            <div id="origin_marker_y"></div>
+          </div>
         </div>
       </div>
     </div>
     <div id="canvas"></div>
   </div>
-  <div class="button_container">
-    <button id="exportButton" disabled>Export</button>
+  <div class="additional_actions hidden">
+    <button class="button_link button_small" id="refresh">
+      Import another frame
+    </button>
   </div>
   <div class="settings">
     <form id="config" oninput="updatePreview(event)">
@@ -225,6 +226,9 @@
       </div>
     </form>
   </div>
+  <div class="button_container">
+    <button id="exportButton" disabled>Export</button>
+  </div>
 </div>
 <div id="shadow_canvas"></div>
 <style>
@@ -241,9 +245,11 @@
   }
 
   #container {
-    padding: 10px;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
+    padding: 10px;
     overflow: hidden;
     box-sizing: border-box;
     background-color: #fff;
@@ -317,12 +323,6 @@
     right: -24px;
     width: calc(100%+48px);
     height: 1px;
-  }
-
-  #refresh {
-    position: absolute;
-    top: 2px;
-    right: 24px;
   }
 
   #preview .start_hint {
@@ -399,8 +399,15 @@
     gap: 16px;
   }
 
+  .additional_actions {
+    display: flex;
+    justify-content: end;
+    padding: 4px 0;
+  }
+
   .button_container {
-    padding: 12px 0;
+    padding-top: 12px;
+    padding-bottom: 2px;
     display: flex;
     gap: 8px;
   }
@@ -417,7 +424,7 @@
     gap: 6px;
   }
 
-  #origin {
+  #origin_controls {
     position: absolute;
     top: 0;
     left: 0;
@@ -502,6 +509,7 @@
 
   .settings {
     height: 260px;
+    flex-grow: 1;
     overflow-y: auto;
   }
 
@@ -522,9 +530,23 @@
 
 <script>
   const MLTY = 2;
-  document.getElementById("choose").onclick = () => {
-    parent.postMessage({ pluginMessage: { type: "choose" } }, "*");
-  };
+
+  function importFrame() {
+    parent.postMessage({ pluginMessage: { type: "import" } }, "*");
+  }
+
+  function initFrame({ svg, params }) {
+    const canvas = document.getElementById("canvas");
+    const shadowCanvas = document.getElementById("shadow_canvas");
+    canvas.innerHTML = svg;
+    shadowCanvas.innerHTML = svg;
+    shadowCanvas.style.width = `${params.width * MLTY}px`;
+    shadowCanvas.style.height = `${params.height * MLTY}px`;
+    document.querySelector(".start_container")?.classList.add("hidden");
+    document.querySelector(".preview_controls")?.classList.remove("hidden");
+    document.querySelector(".additional_actions")?.classList.remove("hidden");
+    document.getElementById("exportButton").disabled = false;
+  }
 
   function updateSiblingInput(initInput) {
     const { id, value } = initInput;
@@ -621,14 +643,12 @@
 
   function updateOrigin(e) {
     const inputs = Array.from(
-      document.getElementById("origin").querySelectorAll("input")
+      document.getElementById("origin_controls").querySelectorAll("input")
     ).filter((item) => item.type === "range");
     const [originX, originY] = inputs.map((input) => input.value);
 
     const originMarkerX = document.querySelector("#origin_marker_x");
     const originMarkerY = document.querySelector("#origin_marker_y");
-
-    console.log(originMarkerX.style);
 
     originMarkerX.style.left = originX + "%";
     originMarkerY.style.top = originY + "%";
@@ -640,21 +660,7 @@
     shadowSvg.style.transformOrigin = `${originX}% ${originY}%`;
   }
 
-  onmessage = (event) => {
-    const { svg, params } = event.data.pluginMessage;
-    const canvas = document.getElementById("canvas");
-    const shadowCanvas = document.getElementById("shadow_canvas");
-    canvas.innerHTML = svg;
-    shadowCanvas.innerHTML = svg;
-    shadowCanvas.style.width = `${params.width * MLTY}px`;
-    shadowCanvas.style.height = `${params.height * MLTY}px`;
-    document.querySelector(".start_container")?.classList.add("hidden");
-    document.querySelector(".preview_controls")?.classList.remove("hidden");
-
-    document.getElementById("exportButton").disabled = false;
-  };
-
-  document.getElementById("exportButton").addEventListener("click", () => {
+  function exportFrame() {
     const svgContainer = document.getElementById("shadow_canvas");
     const svgElement = svgContainer.children[0];
 
@@ -695,5 +701,17 @@
       );
     };
     img.src = url;
-  });
+  }
+
+  onmessage = (event) => {
+    const { type, data } = event.data.pluginMessage;
+    switch (type) {
+      case "sendFrame":
+        initFrame(data);
+    }
+  };
+
+  document.querySelector("#import").onclick = importFrame;
+  document.querySelector("#refresh").onclick = importFrame;
+  document.querySelector("#exportButton").onclick = exportFrame;
 </script>

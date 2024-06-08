@@ -4,16 +4,19 @@ figma.showUI(__html__, {
 });
 
 figma.ui.onmessage = async (msg: { type: string; image: string }) => {
-  if (msg.type === "choose") {
+  if (msg.type === "import") {
     const frame = figma.currentPage.selection[0];
 
     if (frame) {
       const svg = await frame.exportAsync({ format: "SVG_STRING" });
       figma.ui.postMessage({
-        svg,
-        params: {
-          width: frame.width,
-          height: frame.height,
+        type: "sendFrame",
+        data: {
+          svg,
+          params: {
+            width: frame.width,
+            height: frame.height,
+          },
         },
       });
     }
