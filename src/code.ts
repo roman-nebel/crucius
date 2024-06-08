@@ -4,7 +4,7 @@ figma.showUI(__html__, {
 });
 
 figma.ui.onmessage = async (msg: { type: string; image: string }) => {
-  if (msg.type === "catch") {
+  if (msg.type === "choose") {
     const frame = figma.currentPage.selection[0];
 
     if (frame) {
