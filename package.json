@@ -1,6 +1,6 @@
 {
   "name": "crucius",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Transform any Figma layer like you have real CSS",
   "main": "dist/code.js",
   "scripts": {

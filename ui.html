@@ -157,12 +157,12 @@
       <div class="config_block">
         <div class="config_header_container">
           <h3>Scale</h3>
-          <div class="checkbox_container" title="Soon..">
-            <input id="separate_scale" type="checkbox" disabled />
+          <div class="checkbox_container">
+            <input id="separate_scale" type="checkbox" />
             <label for="separate_scale">Separate scale axes</label>
           </div>
         </div>
-        <div class="config_element">
+        <div class="config_element scale_one_param">
           <label for="scale">Scale</label>
           <div class="input_pair">
             <input
@@ -183,7 +183,7 @@
             />
           </div>
         </div>
-        <div class="config_element hidden">
+        <div class="config_element scale_two_params hidden">
           <label for="scaleX">ScaleX</label>
           <div class="input_pair">
             <input
@@ -302,6 +302,11 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+
+  .checkbox_container input,
+  .checkbox_container label {
+    cursor: pointer;
   }
 
   .start_container {
@@ -619,6 +624,34 @@
     }
   }
 
+  function changeScaleType(e) {
+    const { checked } = e.target;
+    const oneScale = getElement(".scale_one_param");
+    const twoScales = getElement(".scale_two_params");
+    const value = checked
+      ? getElement("input[type='range']", oneScale).value
+      : getElement("input[type='range']", twoScales).value;
+    const inputs = checked
+      ? getElement("input", twoScales, {
+          all: true,
+          asArray: true,
+        })
+      : getElement("input", oneScale, {
+          all: true,
+          asArray: true,
+        });
+    for (const input of inputs) {
+      input.value = value;
+    }
+    if (checked) {
+      oneScale.classList.add("hidden");
+      twoScales.classList.remove("hidden");
+    } else {
+      oneScale.classList.remove("hidden");
+      twoScales.classList.add("hidden");
+    }
+  }
+
   function updatePreview(e) {
     updateSiblingInput(e.target);
     const configContainer = getElement("#config");
@@ -787,4 +820,5 @@
   getElement("#import").onclick = importFrame;
   getElement("#refresh").onclick = importFrame;
   getElement("#exportButton").onclick = exportFrame;
+  getElement("#separate_scale").onclick = changeScaleType;
 </script>
