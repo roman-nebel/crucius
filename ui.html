@@ -31,11 +31,11 @@
   </div>
   <div class="settings">
     <form id="config" oninput="updatePreview(event)">
-      <div class="configBlock">
+      <div class="config_block">
         <h3>Move</h3>
-        <div class="configElement">
+        <div class="config_element">
           <label for="translateX">Horizontal</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="translateX_range"
               type="range"
@@ -52,9 +52,9 @@
             />
           </div>
         </div>
-        <div class="configElement">
+        <div class="config_element">
           <label for="translateY">Vertical</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="translateY_range"
               type="range"
@@ -72,11 +72,11 @@
           </div>
         </div>
       </div>
-      <div class="configBlock">
+      <div class="config_block">
         <h3>Perspective</h3>
-        <div class="configElement">
+        <div class="config_element">
           <label for="perspective">Perspective Depth</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="perspective_range"
               type="range"
@@ -94,11 +94,11 @@
           </div>
         </div>
       </div>
-      <div class="configBlock">
+      <div class="config_block">
         <h3>Rotate</h3>
-        <div class="configElement">
+        <div class="config_element">
           <label for="rotateX">RotateX</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="rotateX_range"
               type="range"
@@ -115,9 +115,9 @@
             />
           </div>
         </div>
-        <div class="configElement">
+        <div class="config_element">
           <label for="rotateY">RotateY</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="rotateY_range"
               type="range"
@@ -134,9 +134,9 @@
             />
           </div>
         </div>
-        <div class="configElement">
+        <div class="config_element">
           <label for="rotateZ">RotateZ</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="rotateZ_range"
               type="range"
@@ -154,11 +154,38 @@
           </div>
         </div>
       </div>
-      <div class="configBlock">
-        <h3>Scale</h3>
-        <div class="configElement">
+      <div class="config_block">
+        <div class="config_header_container">
+          <h3>Scale</h3>
+          <div class="checkbox_container" title="Soon..">
+            <input id="separate_scale" type="checkbox" disabled />
+            <label for="separate_scale">Separate scale axes</label>
+          </div>
+        </div>
+        <div class="config_element">
+          <label for="scale">Scale</label>
+          <div class="input_pair">
+            <input
+              id="scale_range"
+              type="range"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+            <input
+              id="scale_number"
+              type="number"
+              min="0.1"
+              max="10"
+              step="0.1"
+              value="1"
+            />
+          </div>
+        </div>
+        <div class="config_element hidden">
           <label for="scaleX">ScaleX</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="scaleX_range"
               type="range"
@@ -177,7 +204,7 @@
             />
           </div>
           <label for="scaleY">ScaleY</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input
               id="scaleY_range"
               type="range"
@@ -197,11 +224,11 @@
           </div>
         </div>
       </div>
-      <div class="configBlock">
+      <div class="config_block">
         <h3>Skew</h3>
-        <div class="configElement">
+        <div class="config_element">
           <label for="skewX">SkewX</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input id="skewX_range" type="range" min="-89" max="89" value="0" />
             <input
               id="skewX_number"
@@ -212,7 +239,7 @@
             />
           </div>
           <label for="skewY">SkewY</label>
-          <div class="inputPair">
+          <div class="input_pair">
             <input id="skewY_range" type="range" min="-89" max="89" value="0" />
             <input
               id="skewY_number"
@@ -262,11 +289,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
     overflow: hidden;
     background-color: #eee;
     padding: 24px;
     border-radius: 12px;
     box-sizing: border-box;
+  }
+
+  .checkbox_container {
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .start_container {
@@ -412,13 +447,20 @@
     gap: 8px;
   }
 
-  .configBlock {
+  .config_block {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .inputPair {
+  .config_header_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .input_pair {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -531,21 +573,37 @@
 <script>
   const MLTY = 2;
 
+  function getElement(
+    selector,
+    parent = document,
+    { all = false, asArray = false } = {}
+  ) {
+    if (all) {
+      const elements = parent.querySelectorAll(selector);
+      return asArray ? Array.from(elements) : elements;
+    }
+    return parent.querySelector(selector);
+  }
+
+  function postMessage(message) {
+    parent.postMessage({ pluginMessage: message }, "*");
+  }
+
   function importFrame() {
-    parent.postMessage({ pluginMessage: { type: "import" } }, "*");
+    postMessage({ type: "import" });
   }
 
   function initFrame({ svg, params }) {
-    const canvas = document.getElementById("canvas");
-    const shadowCanvas = document.getElementById("shadow_canvas");
+    const canvas = getElement("#canvas");
+    const shadowCanvas = getElement("#shadow_canvas");
     canvas.innerHTML = svg;
     shadowCanvas.innerHTML = svg;
     shadowCanvas.style.width = `${params.width * MLTY}px`;
     shadowCanvas.style.height = `${params.height * MLTY}px`;
-    document.querySelector(".start_container")?.classList.add("hidden");
-    document.querySelector(".preview_controls")?.classList.remove("hidden");
-    document.querySelector(".additional_actions")?.classList.remove("hidden");
-    document.getElementById("exportButton").disabled = false;
+    getElement(".start_container")?.classList.add("hidden");
+    getElement(".preview_controls")?.classList.remove("hidden");
+    getElement(".additional_actions")?.classList.remove("hidden");
+    getElement("#exportButton").disabled = false;
   }
 
   function updateSiblingInput(initInput) {
@@ -553,19 +611,32 @@
     const [param, type] = id.split("_");
 
     if (type === "range") {
-      document.getElementById(`${param}_number`).value = value;
+      getElement(`#${param}_number`).value = value;
     }
 
     if (type === "number") {
-      document.getElementById(`${param}_range`).value = value;
+      getElement(`#${param}_range`).value = value;
     }
   }
 
   function updatePreview(e) {
     updateSiblingInput(e.target);
-    const inputs = Array.from(
-      document.getElementById("config").querySelectorAll("input")
-    ).filter((item) => item.type === "number");
+    const configContainer = getElement("#config");
+    let inputs = getElement("input[type='range']", configContainer, {
+      all: true,
+      asArray: true,
+    });
+
+    const isScaleSeparated = getElement("#separate_scale").checked;
+
+    if (isScaleSeparated) {
+      inputs = inputs.filter((item) => item.id !== "scale_range");
+    } else {
+      inputs = inputs.filter(
+        (item) => item.id !== "scaleX_range" && item.id !== "scaleY_range"
+      );
+    }
+
     const params = inputs.map((input) => {
       const { id, value } = input;
       const [param, type] = id.split("_");
@@ -583,8 +654,8 @@
       return [param, value, unit];
     });
 
-    const canvas = document.getElementById("canvas");
-    const shadowCanvas = document.getElementById("shadow_canvas");
+    const canvas = getElement("#canvas");
+    const shadowCanvas = getElement("#shadow_canvas");
 
     const svg = canvas.children[0];
     const shadowSvg = shadowCanvas.children[0];
@@ -642,26 +713,28 @@
   }
 
   function updateOrigin(e) {
-    const inputs = Array.from(
-      document.getElementById("origin_controls").querySelectorAll("input")
-    ).filter((item) => item.type === "range");
+    const configContainer = getElement("#origin_controls");
+    const inputs = getElement("input[type='range']", configContainer, {
+      all: true,
+      asArray: true,
+    });
     const [originX, originY] = inputs.map((input) => input.value);
 
-    const originMarkerX = document.querySelector("#origin_marker_x");
-    const originMarkerY = document.querySelector("#origin_marker_y");
+    const originMarkerX = getElement("#origin_marker_x");
+    const originMarkerY = getElement("#origin_marker_y");
 
     originMarkerX.style.left = originX + "%";
     originMarkerY.style.top = originY + "%";
 
-    const svg = document.getElementById("canvas").children[0];
+    const svg = getElement("#canvas").children[0];
     svg.style.transformOrigin = `${originX}% ${originY}%`;
 
-    const shadowSvg = document.getElementById("shadow_canvas").children[0];
+    const shadowSvg = getElement("#shadow_canvas").children[0];
     shadowSvg.style.transformOrigin = `${originX}% ${originY}%`;
   }
 
   function exportFrame() {
-    const svgContainer = document.getElementById("shadow_canvas");
+    const svgContainer = getElement("#shadow_canvas");
     const svgElement = svgContainer.children[0];
 
     const canvas = document.createElement("canvas");
@@ -711,7 +784,7 @@
     }
   };
 
-  document.querySelector("#import").onclick = importFrame;
-  document.querySelector("#refresh").onclick = importFrame;
-  document.querySelector("#exportButton").onclick = exportFrame;
+  getElement("#import").onclick = importFrame;
+  getElement("#refresh").onclick = importFrame;
+  getElement("#exportButton").onclick = exportFrame;
 </script>
