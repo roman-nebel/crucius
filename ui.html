@@ -576,7 +576,7 @@
 </style>
 
 <script>
-  const MLTY = 2;
+  const MLTY = 1;
 
   function getElement(
     selector,
@@ -693,14 +693,17 @@
     const svg = canvas.children[0];
     const shadowSvg = shadowCanvas.children[0];
 
+    const ratio = canvas.offsetWidth / canvas.offsetHeight;
+    const longerSide = ratio >= 1 ? canvas.offsetWidth : canvas.offsetHeight;
+    const longerSideOrigin =
+      ratio >= 1 ? shadowCanvas.offsetWidth : shadowCanvas.offsetHeight;
+
     const previewParams = params.map(([id, value, unit]) => {
       if (id === "perspective") {
         if (value === "-1") {
           return `${id}(none)`;
         } else {
-          return `${id}(${
-            (((canvas.offsetWidth + canvas.offsetHeight) / 2) * value) / 100
-          }${unit})`;
+          return `${id}(${longerSide * (value / 10)}${unit})`;
         }
       }
 
@@ -720,11 +723,7 @@
         if (value === "-1") {
           return `${id}(none)`;
         } else {
-          return `${id}(${
-            (((shadowCanvas.offsetWidth + shadowCanvas.offsetHeight) / 2) *
-              value) /
-            100
-          }${unit})`;
+          return `${id}(${longerSideOrigin * (value / 10)}${unit})`;
         }
       }
 
