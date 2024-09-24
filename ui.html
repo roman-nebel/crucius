@@ -624,6 +624,11 @@
     }
   }
 
+  function getScale(params) {
+    const scaleParam = params.find((item) => item[0] === "scale");
+    return scaleParam ? scaleParam[1] : 1;
+  }
+
   function changeScaleType(e) {
     const { checked } = e.target;
     const oneScale = getElement(".scale_one_param");
@@ -687,6 +692,8 @@
       return [param, value, unit];
     });
 
+    const scale = getScale(params);
+
     const canvas = getElement("#canvas");
     const shadowCanvas = getElement("#shadow_canvas");
 
@@ -708,11 +715,11 @@
       }
 
       if (id === "translateX") {
-        return `${id}(${(svg.width.baseVal.value * value) / 100}${unit})`;
+        return `${id}(${(252 * value * scale) / 100}${unit})`;
       }
 
       if (id === "translateY") {
-        return `${id}(${(svg.height.baseVal.value * value) / 100}${unit})`;
+        return `${id}(${(231 * value * scale) / 100}${unit})`;
       }
 
       return `${id}(${value}${unit})`;
@@ -728,12 +735,14 @@
       }
 
       if (id === "translateX") {
-        return `${id}(${(shadowSvg.width.baseVal.value * value) / 100}${unit})`;
+        return `${id}(${
+          (shadowSvg.width.baseVal.value * value * scale) / 100
+        }${unit})`;
       }
 
       if (id === "translateY") {
         return `${id}(${
-          (shadowSvg.height.baseVal.value * value) / 100
+          (shadowSvg.height.baseVal.value * value * scale) / 100
         }${unit})`;
       }
 
