@@ -8,6 +8,7 @@
       >
       <button id="import">Import element</button>
     </div>
+    <div id="canvas"></div>
     <div class="preview_controls hidden">
       <div class="origin">
         <form id="origin_controls" oninput="updateOrigin(event)">
@@ -22,7 +23,6 @@
         </div>
       </div>
     </div>
-    <div id="canvas"></div>
   </div>
   <div class="additional_actions hidden">
     <button class="button_link button_small" id="refresh">
@@ -376,6 +376,8 @@
     background-color: #fff;
     border: 2px dashed rgba(0, 0, 0, 0.4);
     border-radius: 4px;
+    overflow: hidden;
+    z-index: 1;
   }
 
   #canvas_overlay {
